@@ -5,6 +5,7 @@ from .views import (
     CreateCommentView,
     RetrieveCommentView,
     UpdateCommentView,
+    DeleteCommentView,
 )
 
 urlpatterns = [
@@ -28,5 +29,9 @@ urlpatterns = [
         UpdateCommentView.as_view(),
         name="update_comment",
     ),
-
+    path(
+        "comments/<uuid:pk>/delete/",
+        DeleteCommentView.as_view(),
+        name="delete_comment",
+    ),
 ]

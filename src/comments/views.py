@@ -58,3 +58,20 @@ class UpdateCommentView(generics.UpdateAPIView):
             .filter(is_deleted=False)
             .select_related("author", "post")
         )
+
+class DeleteCommentView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(
+            author=self.request.user,
+            is_deleted=False,
+        )
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save(update_fields=["is_deleted"])
+
+        post = instance.post
+        post.comments_count -= 1
+        post.save(update_fields=["comments_count"])
