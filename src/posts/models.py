@@ -62,7 +62,7 @@ class Media(models.Model):
     media_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
 
     # Display order for multiple media files
-    order = models.PositiveSmallIntegerField(defaulty=0)
+    order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         ordering = ["order", "id"]

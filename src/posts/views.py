@@ -1,3 +1,5 @@
+from tokenize import Comment
+
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
@@ -100,9 +102,9 @@ class CommentListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-    return (
-        Comment.objects
-        .filter(
+        return (
+            Comment.objects
+            .filter(
             post_id=self.kwargs["post_id"],
             is_deleted=False,
         )
