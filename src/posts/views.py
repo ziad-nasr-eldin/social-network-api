@@ -1,11 +1,8 @@
-from tokenize import Comment
-
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from .models import Post, Media
-from .serializers import PostSerializer, MediaSerializer, CommentSerializer
-from rest_framework.permissions import IsAuthenticated
+from .serializers import PostSerializer, MediaSerializer
 from .permissions import IsAuthorOrReadOnly
 
 
@@ -84,54 +81,3 @@ class UploadMediaView(generics.CreateAPIView):
 
         serializer.save()
 
-class CreateCommentView(generics.CreateAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        comment = serializer.save(
-            author=self.request.user
-        )
-
-        post = comment.post
-        post.comments_count += 1
-        post.save(update_fields=["comments_count"])
-
-class CommentListView(generics.ListAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        return (
-            Comment.objects
-            .filter(
-            post_id=self.kwargs["post_id"],
-            is_deleted=False,
-        )
-        .select_related("author")
-    )
-
-class RetrieveCommentView(generics.RetrieveAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        return (
-            Comment.objects
-            .filter(is_deleted=False)
-            .select_related("author", "post")
-        )
-
-class UpdateCommentView(generics.UpdateAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsAuthorOrReadOnly,
-    ]
-
-    def get_queryset(self):
-        return (
-            Comment.objects
-            .filter(is_deleted=False)
-            .select_related("author", "post")
-        )
