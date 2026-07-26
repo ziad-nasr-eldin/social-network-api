@@ -119,3 +119,17 @@ class RetrieveCommentView(generics.RetrieveAPIView):
             .filter(is_deleted=False)
             .select_related("author", "post")
         )
+
+class UpdateCommentView(generics.UpdateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsAuthorOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        return (
+            Comment.objects
+            .filter(is_deleted=False)
+            .select_related("author", "post")
+        )
