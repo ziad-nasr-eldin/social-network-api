@@ -15,3 +15,20 @@ class CreateLikeView(generics.CreateAPIView):
     post = like.post
     post.likes_count += 1
     post.save(update_fields=["likes_count"])
+
+
+class DeleteLikeView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Like.objects.filter(
+            user=self.request.user,
+        )
+
+    def perform_destroy(self, instance):
+        post = instance.post
+
+        instance.delete()
+
+        post.likes_count -= 1
+        post.save(update_fields=["likes_count"])
