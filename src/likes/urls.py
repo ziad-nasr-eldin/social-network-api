@@ -1,4 +1,4 @@
-from .views import CreateLikeView, DeleteLikeView
+from .views import CreateLikeView, DeleteLikeView, LikeListView
 
 
 urlpatterns = [
@@ -11,5 +11,10 @@ urlpatterns = [
         "likes/<uuid:pk>/",
         DeleteLikeView.as_view(),
         name="delete_like",
+    ),
+    path(
+        "posts/<uuid:post_id>/likes/",
+        LikeListView.as_view(),
+        name="post_likes",
     ),
 ]

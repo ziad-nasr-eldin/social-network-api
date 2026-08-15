@@ -15,3 +15,14 @@ class LikeSerializer(serializers.ModelSerializer):
             "id",
             "created_at",
         )
+
+class LikeUserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username")
+
+    class Meta:
+        model = Like
+        fields = (
+            "username",
+            "created_at",
+        )
+
