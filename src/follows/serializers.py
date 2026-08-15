@@ -3,15 +3,14 @@ from rest_framework import serializers
 from .models import Follow
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowerSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source="follower.username",
+    )
+
     class Meta:
         model = Follow
         fields = (
-            "id",
-            "following",
-            "created_at",
-        )
-        read_only_fields = (
-            "id",
+            "username",
             "created_at",
         )
