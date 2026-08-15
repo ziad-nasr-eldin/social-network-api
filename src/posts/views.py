@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from .models import Post, Media
 from .serializers import PostSerializer, MediaSerializer
 from .permissions import IsAuthorOrReadOnly
+from .pagination import FeedPagination
 
 
 class CreatePostView(generics.CreateAPIView):
@@ -14,16 +15,28 @@ class CreatePostView(generics.CreateAPIView):
         serializer.save(author=self.request.user)
 
 
-class PostListView(generics.ListAPIView):
+class FeedListView(generics.ListAPIView):
     serializer_class = PostSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    pagination_class = FeedPagination
 
     def get_queryset(self):
+        user = self.request.user
+
+        following_ids = user.following_set.values_list(
+            "following_id",
+            flat=True,
+        )
+
         return (
             Post.objects
-            .filter(is_deleted=False)
-            .select_related("author", "original_post")
+            .filter(
+                author_id__in=list(following_ids) + [user.id],
+                is_deleted=False,
+            )
+            .select_related("author")
             .prefetch_related("media")
+            .order_by("-created_at")
         )
 
 
