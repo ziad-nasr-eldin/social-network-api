@@ -17,4 +17,9 @@ urlpatterns = [
         LikeListView.as_view(),
         name="post_likes",
     ),
+    path(
+        "likes/my-posts/",
+        LikedPostListView.as_view(),
+        name="liked_posts",
+    ),
 ]

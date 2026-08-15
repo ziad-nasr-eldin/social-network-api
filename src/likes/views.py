@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Like
-from .serializers import LikeSerializer, LikeUserSerializer
+from .serializers import LikeSerializer, LikeUserSerializer, LikedPostSerializer
 
 
 class CreateLikeView(generics.CreateAPIView):
@@ -42,4 +42,19 @@ class LikeListView(generics.ListAPIView):
             Like.objects
             .filter(post_id=self.kwargs["post_id"])
             .select_related("user")
+        )
+
+class LikedPostListView(generics.ListAPIView):
+    serializer_class = LikedPostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Post.objects
+            .filter(
+                likes__user=self.request.user,
+                is_deleted=False,
+            )
+            .select_related("author")
+            .distinct()
         )
