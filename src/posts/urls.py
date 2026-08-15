@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    FeedListView,
     PostListView,
     CreatePostView,
     UpdatePostView,
@@ -8,6 +9,7 @@ from .views import (
     DeletePostView,
     UploadMediaView,
     )
+
 urlpatterns = [
     path(
         "posts/",
@@ -38,5 +40,10 @@ urlpatterns = [
         "posts/media/",
         UploadMediaView.as_view(),
         name="upload_media",
+    ),
+    path(
+    "feed/",
+    FeedListView.as_view(),
+    name="feed",
     ),
 ]

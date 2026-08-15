@@ -81,3 +81,26 @@ class UploadMediaView(generics.CreateAPIView):
 
         serializer.save()
 
+
+class FeedListView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        following_ids = user.following_set.values_list(
+            "following_id",
+            flat=True,
+        )
+
+        return (
+            Post.objects
+            .filter(
+                author_id__in=list(following_ids) + [user.id],
+                is_deleted=False,
+            )
+            .select_related("author")
+            .prefetch_related("media")
+            .order_by("-created_at")
+        )
