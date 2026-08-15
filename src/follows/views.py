@@ -21,3 +21,24 @@ class CreateFollowView(generics.CreateAPIView):
         follower.save(update_fields=["following_count"])
         following.save(update_fields=["followers_count"])
 
+
+class DeleteFollowView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Follow.objects.filter(
+            follower=self.request.user,
+            following_id=self.kwargs["user_id"],
+        )
+
+    def perform_destroy(self, instance):
+        follower = instance.follower
+        following = instance.following
+
+        instance.delete()
+
+        follower.following_count -= 1
+        following.followers_count -= 1
+
+        follower.save(update_fields=["following_count"])
+        following.save(update_fields=["followers_count"])
