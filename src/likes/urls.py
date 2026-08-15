@@ -1,4 +1,5 @@
-from .views import CreateLikeView, DeleteLikeView, LikeListView
+from django.urls import path
+from .views import CreateLikeView, DeleteLikeView, LikeListView, LikedPostListView
 
 
 urlpatterns = [
