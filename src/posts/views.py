@@ -1,6 +1,9 @@
+from django.db.models import Subquery, Q
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
+
+from follows.models import Follow
 from .models import Post, Media
 from .serializers import PostSerializer, MediaSerializer
 from .permissions import IsAuthorOrReadOnly
@@ -15,6 +18,7 @@ class CreatePostView(generics.CreateAPIView):
         serializer.save(author=self.request.user)
 
 
+
 class FeedListView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
@@ -23,23 +27,22 @@ class FeedListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        following_ids = user.following_set.values_list(
-            "following_id",
-            flat=True,
-        )
+        following_ids = Follow.objects.filter(
+            follower=user,
+        ).values("following_id")
 
         return (
             Post.objects
             .filter(
-                author_id__in=list(following_ids) + [user.id],
+                Q(author_id=user.id) |
+                Q(author_id__in=Subquery(following_ids)),
                 is_deleted=False,
             )
             .select_related("author")
             .prefetch_related("media")
             .order_by("-created_at")
         )
-
-
+    
 class UpdatePostView(generics.UpdateAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
