@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CreateFollowView, DeleteFollowView, FollowersListView
+from .views import CreateFollowView, DeleteFollowView, FollowersListView, FollowingListView
 
 
 urlpatterns = [
@@ -18,5 +18,10 @@ urlpatterns = [
     "users/<uuid:user_id>/followers/",
     FollowersListView.as_view(),
     name="followers_list",
+    ),
+    path(
+    "users/<uuid:user_id>/following/",
+    FollowingListView.as_view(),
+    name="following_list",
     ),
 ]

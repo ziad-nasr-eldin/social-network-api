@@ -1,8 +1,8 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import Follow
-from .serializers import FollowSerializer, FollowerSerializer
+from .serializers import FollowSerializer, FollowerSerializer, FollowingSerializer
 
 
 class CreateFollowView(generics.CreateAPIView):
@@ -53,4 +53,16 @@ class FollowersListView(generics.ListAPIView):
             Follow.objects
             .filter(following_id=self.kwargs["user_id"])
             .select_related("follower")
+        )
+
+
+class FollowingListView(generics.ListAPIView):
+    serializer_class = FollowingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Follow.objects
+            .filter(follower_id=self.kwargs["user_id"])
+            .select_related("following")
         )

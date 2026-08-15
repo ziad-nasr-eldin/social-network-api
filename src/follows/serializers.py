@@ -14,3 +14,16 @@ class FollowerSerializer(serializers.ModelSerializer):
             "username",
             "created_at",
         )
+
+
+class FollowingSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source="following.username",
+    )
+
+    class Meta:
+        model = Follow
+        fields = (
+            "username",
+            "created_at",
+        )
