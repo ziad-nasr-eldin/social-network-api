@@ -28,3 +28,14 @@ def create_comment_notification(comment):
         post=post,
         comment=comment,
     )
+
+
+def create_follow_notification(follow):
+    if follow.follower == follow.following:
+        return
+
+    Notification.objects.create(
+        recipient=follow.following,
+        actor=follow.follower,
+        notification_type=Notification.FOLLOW,
+    )

@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Follow
 from .serializers import FollowSerializer, FollowerSerializer, FollowingSerializer
 
+from notifications.services import create_follow_notification
 
 class CreateFollowView(generics.CreateAPIView):
     serializer_class = FollowSerializer
@@ -21,6 +22,7 @@ class CreateFollowView(generics.CreateAPIView):
         follower.save(update_fields=["following_count"])
         following.save(update_fields=["followers_count"])
 
+        create_follow_notification(follow)
 
 class DeleteFollowView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
