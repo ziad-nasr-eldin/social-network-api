@@ -1,12 +1,17 @@
 from django.shortcuts import render
+
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
+from rest_framework import status
+
 from .models import Comment
 from .serializers import CommentSerializer
 from .permissions import IsAuthorOrReadOnly
-from rest_framework import status
-# Create your views here.
+
+from notifications.services import create_comment_notification
+
+
 class CreateCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
@@ -19,6 +24,8 @@ class CreateCommentView(generics.CreateAPIView):
         post = comment.post
         post.comments_count += 1
         post.save(update_fields=["comments_count"])
+    
+        create_comment_notification(comment)
 
 class CommentListView(generics.ListAPIView):
     serializer_class = CommentSerializer
