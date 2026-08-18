@@ -5,6 +5,8 @@ from .models import Like
 from .serializers import LikeSerializer, LikeUserSerializer, LikedPostSerializer
 from posts.models import Post
 
+from notifications.services import create_like_notification
+
 class CreateLikeView(generics.CreateAPIView):
     serializer_class = LikeSerializer
     permission_classes = [IsAuthenticated]
@@ -16,6 +18,7 @@ class CreateLikeView(generics.CreateAPIView):
         post.likes_count += 1
         post.save(update_fields=["likes_count"])
 
+        create_like_notification(like)
 
 class DeleteLikeView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
