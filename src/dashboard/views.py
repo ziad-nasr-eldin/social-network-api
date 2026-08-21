@@ -4,6 +4,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from notifications.models import Notification
+from notifications.serializers import NotificationSerializer
 from posts.serializers import PostSerializer
 
 
@@ -18,6 +20,16 @@ class DashboardView(generics.GenericAPIView):
             .filter(is_deleted=False)
             .select_related("author")
             .prefetch_related("media")
+            .order_by("-created_at")[:5]
+        )
+
+        notifications = (
+            user.notifications
+            .select_related(
+                "actor",
+                "post",
+                "comment",
+            )
             .order_by("-created_at")[:5]
         )
 
@@ -49,6 +61,11 @@ class DashboardView(generics.GenericAPIView):
             },
             "recent_posts": PostSerializer(
                 posts,
+                many=True,
+                context={"request": request},
+            ).data,
+            "recent_notifications": NotificationSerializer(
+                notifications,
                 many=True,
                 context={"request": request},
             ).data,
