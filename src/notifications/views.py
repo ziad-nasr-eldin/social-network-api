@@ -1,5 +1,6 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import Notification
 from .serializers import NotificationSerializer
@@ -39,3 +40,16 @@ class MarkNotificationAsReadView(generics.UpdateAPIView):
         serializer = self.get_serializer(notification)
 
         return Response(serializer.data)
+
+class UnreadNotificationCountView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        unread_count = Notification.objects.filter(
+            recipient=request.user,
+            is_read=False,
+        ).count()
+
+        return Response({
+            "unread_count": unread_count,
+        })
