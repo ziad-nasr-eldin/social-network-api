@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "likes",
     "follows",
     "notifications",
+    'dashboard',
 ]
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
