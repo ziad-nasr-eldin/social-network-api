@@ -53,3 +53,21 @@ class UnreadNotificationCountView(generics.GenericAPIView):
         return Response({
             "unread_count": unread_count,
         })
+
+
+class MarkAllNotificationsAsReadView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        Notification.objects.filter(
+            recipient=request.user,
+            is_read=False,
+        ).update(
+            is_read=True,
+        )
+
+        return Response(
+            {
+                "detail": "All notifications marked as read."
+            }
+        )
